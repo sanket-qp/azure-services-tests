@@ -2,7 +2,7 @@
 name = "azure-services-tests"
 version = "0.1.0"
 description = ""
-authors = ["Sanket Patel <sanket.patel@wellsfargo.com>"]
+authors = ["Sanket Patel <>"]
 readme = "README.md"
 packages = [{include = "azure_services_tests", from = "src"}]
 
