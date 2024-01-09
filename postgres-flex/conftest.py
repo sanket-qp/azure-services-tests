@@ -1,14 +1,22 @@
 import pytest
 import psycopg2
 
+def pytest_addoption(parser):
+    parser.addoption("--host", action="store", default="localhost", help="postgres host")
+    parser.addoption("--port", action="store", default=5432, help="postgres port")
+    parser.addoption("--dbname", action="store", default="test_database", help="database name")
+    parser.addoption("--admin_user", action="store", default="sanket", help="postgres admin username")
+    parser.addoption("--admin_password", action="store", default="", help="postgres admin user's password")
+
+
 @pytest.fixture(scope='module')
-def connection_params():
+def connection_params(pytestconfig):
     return {
-        'host': 'localhost',
-        'port': 5432,
-        'database': 'test_database',
-        'user': 'sanket',
-        'password': ''
+        'host': pytestconfig.getoption("host"),
+        'port': pytestconfig.getoption("port"),
+        'database': pytestconfig.getoption("dbname"),
+        'user': pytestconfig.getoption("admin_user"),
+        'password': pytestconfig.getoption("admin_password")
     }
 
 @pytest.fixture(scope='module')

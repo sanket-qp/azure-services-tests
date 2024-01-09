@@ -13,7 +13,7 @@ class TestPostgres:
             db_version = cur.fetchone()
             assert "15.5" in db_version[0]
         
-    def test_query(self, admin_connection):
+    def test_select(self, admin_connection):
         print ("testing query")
         with admin_connection.cursor() as cur:
             cur.execute('SELECT * from test_schema.article')
