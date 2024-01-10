@@ -64,51 +64,33 @@ def load_data(admin_connection):
     """
     Fixture that loads the data using admin connection
     """
-    ## delete_schema(admin_connection)
     try:
-        prepare_schema(admin_connection)
+        prepare_database(admin_connection)
         yield admin_connection
     finally:
-        delete_schema(admin_connection)
-        pass
+        clear_database(admin_connection)
 
-def prepare_schema(connection):
+
+def prepare_database(connection):
     """
     Prepares a postgres schema by executing the `load_data.sql` file
     """
     print ("loading data")
-    delete_schema(connection)
-    prepare_user_and_roles(connection)
-    with connection.cursor() as cur:
-        cur.execute(open("load_data.sql", "r").read())
-        connection.commit()
+    clear_database(connection)
+    execute_sql_file(connection, "create_database.sql")
+    execute_sql_file(connection, "create_user_roles.sql")
+    execute_sql_file(connection, "create_permissions.sql")
+    execute_sql_file(connection, "load_data.sql")
 
-def delete_schema(connection):
+def clear_database(connection):
     """
     Clears postgres database by executing the `clear_data.sql` file
     """
     print ("clearing data")
-    delete_user_and_roles(connection)
-    with connection.cursor() as cur:
-        cur.execute(open("clear_data.sql", "r").read())
-        connection.commit()
-
-
-def prepare_user_and_roles(connection):
-    """
-    creates users and roles with the given postgres connection
-    """
-    execute_sql_file(connection, "create_database.sql")
-    execute_sql_file(connection, "create_user_roles.sql")
-    execute_sql_file(connection, "create_permissions.sql")
-
-def delete_user_and_roles(connection):
-    """
-    creates users and roles with the given postgres connection
-    """
     execute_sql_file(connection, "delete_permissions.sql")
     execute_sql_file(connection, "delete_database.sql")
     execute_sql_file(connection, "delete_user_roles.sql")
+    execute_sql_file(connection, "clear_data.sql")
 
 def execute_sql_file(connection, sql_file):
     """
