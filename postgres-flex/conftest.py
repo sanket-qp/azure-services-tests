@@ -66,19 +66,6 @@ def readonly_connection():
     print ("exiting readonly_connections")
 
 @pytest.fixture(scope='module')
-def load_data(create_database_and_connect):
-    """
-    Fixture that loads the data using admin connection
-    """
-    try:
-        connection = create_database_and_connect
-        prepare_database(connection)
-        yield connection
-    finally:
-        ## clear_database(admin_connection)
-        pass
-
-@pytest.fixture(scope='module')
 def create_database_and_connect(admin_connection, connection_params):
     """
     Fixture that creates an application database and connects to it
@@ -96,12 +83,23 @@ def create_database_and_connect(admin_connection, connection_params):
     finally:
         new_conn.close()
 
+@pytest.fixture(scope='module')
+def db_connection(create_database_and_connect):
+    """
+    Fixture that loads the data using admin connection
+    """
+    try:
+        connection = create_database_and_connect
+        prepare_database(connection)
+        yield connection
+    finally:
+        ## clear_database(admin_connection)
+        print ("Clearning data")
+
 def prepare_database(connection):
     """
-    Prepares a postgres schema by executing the `load_data.sql` file
+    Prepares a postgres schema by executing the sql files
     """
-    print ("loading data")
-    # execute_sql_file(connection, "./sql/create_database.sql")
     execute_sql_file(connection, "./sql/create_user_roles.sql")
     execute_sql_file(connection, "./sql/create_permissions.sql")
     execute_sql_file(connection, "./sql/create_tables.sql")

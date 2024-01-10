@@ -4,21 +4,24 @@ import config
 import psycopg2
 
 class TestPostgres:
-    def test_connection(self, load_data):
+    def test_connection(self, db_connection):
+        """
+        Tests database connection
+        """
         print ("testing connection")
-        admin_connection = load_data
-        with admin_connection.cursor() as cur:
-            cur = admin_connection.cursor()
+        with db_connection.cursor() as cur:
+            cur = db_connection.cursor()
             print('PostgreSQL database version:')
             cur.execute('SELECT version()')
             db_version = cur.fetchone()
             print ("db version: %s" % db_version)
             assert "15.5" in db_version[0]
-            admin_connection.commit()
-    
-    def test_select(self, load_data):
-        connection = load_data
-        with connection.cursor() as cur:
+
+    def test_select(self, db_connection):
+        """
+        Tests select query
+        """
+        with db_connection.cursor() as cur:
             cur.execute('SELECT * from %s' % config.get_article_table_name())
             x = cur.fetchall()
             assert 2 == len(x)
