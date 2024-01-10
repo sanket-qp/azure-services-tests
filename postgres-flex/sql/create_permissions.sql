@@ -1,4 +1,3 @@
-
 CREATE SCHEMA ${appfunc}_schema;
  
 /* Allow users to connect to the database. */

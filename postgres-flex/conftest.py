@@ -1,5 +1,6 @@
 from string import Template
 import config
+import sys
 
 import pytest
 import psycopg2
@@ -30,13 +31,20 @@ def connection_params(pytestconfig):
         'password': pytestconfig.getoption("admin_password")
     }
 
+def connect_to_db(host, port, database, user, password):
+    return psycopg2.connect(host=host,
+                            port=port,
+                            database=database,
+                            user=user,
+                            password=password)
+
 @pytest.fixture(scope='module')
 def admin_connection(connection_params):
     """
     Fixture that returns postgres connection as an admin user
     """
     try:
-        conn = psycopg2.connect(host=connection_params['host'],
+        conn = connect_to_db(host=connection_params['host'],
                             port=connection_params['port'],
                             database=connection_params['database'],
                             user=connection_params['user'],
@@ -58,24 +66,42 @@ def readonly_connection():
     print ("exiting readonly_connections")
 
 @pytest.fixture(scope='module')
-def load_data(admin_connection):
+def load_data(create_database_and_connect):
     """
     Fixture that loads the data using admin connection
     """
     try:
-        prepare_database(admin_connection)
-        yield admin_connection
+        connection = create_database_and_connect
+        prepare_database(connection)
+        yield connection
     finally:
-        clear_database(admin_connection)
+        ## clear_database(admin_connection)
+        pass
 
+@pytest.fixture(scope='module')
+def create_database_and_connect(admin_connection, connection_params):
+    """
+    Fixture that creates an application database and connects to it
+    """
+    clear_database(admin_connection)
+    execute_sql_file(admin_connection, "./sql/create_database.sql")
+    new_db = config.get_db_name()
+    try:
+        new_conn = connect_to_db(host=connection_params['host'],
+                            port=connection_params['port'],
+                            database=new_db,
+                            user=connection_params['user'],
+                            password=connection_params['password'])
+        yield new_conn
+    finally:
+        new_conn.close()
 
 def prepare_database(connection):
     """
     Prepares a postgres schema by executing the `load_data.sql` file
     """
     print ("loading data")
-    clear_database(connection)
-    execute_sql_file(connection, "./sql/create_database.sql")
+    # execute_sql_file(connection, "./sql/create_database.sql")
     execute_sql_file(connection, "./sql/create_user_roles.sql")
     execute_sql_file(connection, "./sql/create_permissions.sql")
     execute_sql_file(connection, "./sql/create_tables.sql")
@@ -93,10 +119,15 @@ def execute_sql_file(connection, sql_file):
     """
     executes commands in the given sql file
     """
+    print ("---------------------------------------------------------")
+    print ("executing: %s" % sql_file)
     with open(sql_file) as f:
         sql_template = f.read()
         sql = Template(sql_template).safe_substitute(
             {'appname': config.APP_NAME, 'appfunc': config.APP_NAME})
         with connection.cursor() as cur:
-            cur.execute(sql)
-                                
+            #print (sql)
+            #print ("--------")
+            rtn = cur.execute(sql)
+            #print ("return: %s" % rtn)
+    print ("---------------------------------------------------------")                                
