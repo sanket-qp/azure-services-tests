@@ -61,3 +61,6 @@ def get_db_connection(host, port, database, user, password):
                             password=password)
     conn.set_session(autocommit=True)
     return conn
+
+def get_db_connection_as_user(host, port, get_database_func, get_user_func, password):
+    return get_db_connection(host, port, get_database_func(), get_user_func(), password)

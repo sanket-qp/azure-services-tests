@@ -48,13 +48,35 @@ def admin_connection(connection_params):
         print ("closing an admin connection")
 
 @pytest.fixture(scope='module')
-def readonly_connection():
+def ddl_user_connection(connection_params):
     """
     Fixture that returns postgres connection as a read_only user
     """
-    print ("entering readonly_connection")
-    yield
-    print ("exiting readonly_connections")
+    try:
+        new_conn = common.get_db_connection(host=connection_params['host'],
+                    port=connection_params['port'],
+                    database=common.get_db_name(),
+                    user=common.get_app_ddl_user(),
+                    password=connection_params['password'])
+        yield new_conn
+    finally:
+        new_conn.close()
+
+@pytest.fixture(scope='module')
+def dql_user_connection(connection_params):
+    """
+    Fixture that returns postgres connection as a read_only user
+    """
+    try:
+        new_conn = common.get_db_connection(host=connection_params['host'],
+                    port=connection_params['port'],
+                    database=common.get_db_name(),
+                    user=common.get_app_dql_user(),
+                    password=connection_params['password'])
+        yield new_conn
+    finally:
+        new_conn.close()
+
 
 @pytest.fixture(scope='module')
 def create_database_and_connect(admin_connection, connection_params):
