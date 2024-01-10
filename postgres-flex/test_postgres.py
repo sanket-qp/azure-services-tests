@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+import config
 
 import psycopg2
 
@@ -17,10 +18,9 @@ class TestPostgres:
     def test_select(self, admin_connection):
         print ("testing query")
         with admin_connection.cursor() as cur:
-            cur.execute('SELECT * from test_schema.article')
+            cur.execute('SELECT * from %s' % config.get_article_table_name())
             x = cur.fetchall()
             assert 2 == len(x)
             assert 'hello_postgres' == x[0][1]
             assert 'hello_redis' == x[1][1]
             admin_connection.commit()
-            

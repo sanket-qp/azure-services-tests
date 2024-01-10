@@ -1,10 +1,8 @@
 from string import Template
-import sys
+import config
 
 import pytest
 import psycopg2
-
-APP_NAME="mysimpleblog"
 
 def pytest_addoption(parser):
     """
@@ -98,7 +96,8 @@ def execute_sql_file(connection, sql_file):
     """
     with open(sql_file) as f:
         sql_template = f.read()
-        sql = Template(sql_template).safe_substitute({'appname': APP_NAME, 'appfunc': APP_NAME})
+        sql = Template(sql_template).safe_substitute(
+            {'appname': config.APP_NAME, 'appfunc': config.APP_NAME})
         with connection.cursor() as cur:
             cur.execute(sql)
                                 
