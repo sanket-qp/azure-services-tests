@@ -1,16 +1,29 @@
+from string import Template
+import sys
+
 import pytest
 import psycopg2
 
+APP_NAME="mysimpleblog"
+
 def pytest_addoption(parser):
+    """
+    Command line arguments specifying postgres connection parameters
+    """
     parser.addoption("--host", action="store", default="localhost", help="postgres host")
     parser.addoption("--port", action="store", default=5432, help="postgres port")
     parser.addoption("--dbname", action="store", default="test_database", help="database name")
-    parser.addoption("--admin_user", action="store", default="sanket", help="postgres admin username")
-    parser.addoption("--admin_password", action="store", default="", help="postgres admin user's password")
+    parser.addoption("--admin_user", action="store", default="sanket",
+                     help="postgres admin username")
+    parser.addoption("--admin_password", action="store", default="",
+                     help="postgres admin user's password")
 
 
 @pytest.fixture(scope='module')
 def connection_params(pytestconfig):
+    """
+    Fixture that returns postgres connection params
+    """
     return {
         'host': pytestconfig.getoption("host"),
         'port': pytestconfig.getoption("port"),
@@ -21,35 +34,89 @@ def connection_params(pytestconfig):
 
 @pytest.fixture(scope='module')
 def admin_connection(connection_params):
-    conn = psycopg2.connect(host=connection_params['host'], 
-                            port=connection_params['port'], 
-                            database=connection_params['database'], 
+    """
+    Fixture that returns postgres connection as an admin user
+    """
+    try:
+        conn = psycopg2.connect(host=connection_params['host'],
+                            port=connection_params['port'],
+                            database=connection_params['database'],
                             user=connection_params['user'],
                             password=connection_params['password'])
-    print ("got an admin connection")
-    conn.set_session(autocommit=True)
-    yield conn
-    conn.close()
-    print ("closing an admin connection")
+        print ("got an admin connection")
+        conn.set_session(autocommit=True)
+        yield conn
+    finally:
+        conn.close()
+        print ("closing an admin connection")
 
 @pytest.fixture(scope='module')
 def readonly_connection():
+    """
+    Fixture that returns postgres connection as a read_only user
+    """
     print ("entering readonly_connection")
     yield
     print ("exiting readonly_connections")
 
 @pytest.fixture(scope='module')
-def load_data(admin_connection):    
-    prepare_schema(admin_connection)
-    yield admin_connection
-    delete_schema(admin_connection)
+def load_data(admin_connection):
+    """
+    Fixture that loads the data using admin connection
+    """
+    ## delete_schema(admin_connection)
+    try:
+        prepare_schema(admin_connection)
+        yield admin_connection
+    finally:
+        delete_schema(admin_connection)
+        pass
 
 def prepare_schema(connection):
+    """
+    Prepares a postgres schema by executing the `load_data.sql` file
+    """
     print ("loading data")
+    delete_schema(connection)
+    prepare_user_and_roles(connection)
     with connection.cursor() as cur:
         cur.execute(open("load_data.sql", "r").read())
+        connection.commit()
 
 def delete_schema(connection):
+    """
+    Clears postgres database by executing the `clear_data.sql` file
+    """
     print ("clearing data")
+    delete_user_and_roles(connection)
     with connection.cursor() as cur:
         cur.execute(open("clear_data.sql", "r").read())
+        connection.commit()
+
+
+def prepare_user_and_roles(connection):
+    """
+    creates users and roles with the given postgres connection
+    """
+    execute_sql_file(connection, "create_database.sql")
+    execute_sql_file(connection, "create_user_roles.sql")
+    execute_sql_file(connection, "create_permissions.sql")
+
+def delete_user_and_roles(connection):
+    """
+    creates users and roles with the given postgres connection
+    """
+    execute_sql_file(connection, "delete_permissions.sql")
+    execute_sql_file(connection, "delete_database.sql")
+    execute_sql_file(connection, "delete_user_roles.sql")
+
+def execute_sql_file(connection, sql_file):
+    """
+    executes commands in the given sql file
+    """
+    with open(sql_file) as f:
+        sql_template = f.read()
+        sql = Template(sql_template).safe_substitute({'appname': APP_NAME, 'appfunc': APP_NAME})
+        with connection.cursor() as cur:
+            cur.execute(sql)
+                                

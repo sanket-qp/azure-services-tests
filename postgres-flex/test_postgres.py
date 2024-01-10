@@ -12,13 +12,15 @@ class TestPostgres:
             cur.execute('SELECT version()')
             db_version = cur.fetchone()
             assert "15.5" in db_version[0]
-        
+            admin_connection.commit()
+    
     def test_select(self, admin_connection):
         print ("testing query")
         with admin_connection.cursor() as cur:
             cur.execute('SELECT * from test_schema.article')
             x = cur.fetchall()
             assert 2 == len(x)
-            assert 'hello_postgres' == x[0][1]            
+            assert 'hello_postgres' == x[0][1]
             assert 'hello_redis' == x[1][1]
+            admin_connection.commit()
             
