@@ -78,7 +78,7 @@ def prepare_database(connection):
     execute_sql_file(connection, "create_database.sql")
     execute_sql_file(connection, "create_user_roles.sql")
     execute_sql_file(connection, "create_permissions.sql")
-    execute_sql_file(connection, "load_data.sql")
+    execute_sql_file(connection, "create_tables.sql")
 
 def clear_database(connection):
     """
@@ -88,7 +88,7 @@ def clear_database(connection):
     execute_sql_file(connection, "delete_permissions.sql")
     execute_sql_file(connection, "delete_database.sql")
     execute_sql_file(connection, "delete_user_roles.sql")
-    execute_sql_file(connection, "clear_data.sql")
+    ## execute_sql_file(connection, "clear_data.sql")
 
 def execute_sql_file(connection, sql_file):
     """
