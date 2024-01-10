@@ -22,8 +22,10 @@ class TestPostgres:
         Tests select query
         """
         with db_connection.cursor() as cur:
+            print ('SELECT * from %s' % config.get_article_table_name());
             cur.execute('SELECT * from %s' % config.get_article_table_name())
             x = cur.fetchall()
+            print (x)
             assert 2 == len(x)
             assert 'hello_postgres' == x[0][1]
             assert 'hello_redis' == x[1][1]

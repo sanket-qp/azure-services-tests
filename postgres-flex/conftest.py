@@ -79,8 +79,10 @@ def create_database_and_connect(admin_connection, connection_params):
                             database=new_db,
                             user=connection_params['user'],
                             password=connection_params['password'])
+        new_conn.set_session(autocommit=True)
         yield new_conn
     finally:
+        print ("Closing new_conn")
         new_conn.close()
 
 @pytest.fixture(scope='module')
