@@ -75,20 +75,19 @@ def prepare_database(connection):
     """
     print ("loading data")
     clear_database(connection)
-    execute_sql_file(connection, "create_database.sql")
-    execute_sql_file(connection, "create_user_roles.sql")
-    execute_sql_file(connection, "create_permissions.sql")
-    execute_sql_file(connection, "create_tables.sql")
+    execute_sql_file(connection, "./sql/create_database.sql")
+    execute_sql_file(connection, "./sql/create_user_roles.sql")
+    execute_sql_file(connection, "./sql/create_permissions.sql")
+    execute_sql_file(connection, "./sql/create_tables.sql")
 
 def clear_database(connection):
     """
     Clears postgres database by executing the `clear_data.sql` file
     """
     print ("clearing data")
-    execute_sql_file(connection, "delete_permissions.sql")
-    execute_sql_file(connection, "delete_database.sql")
-    execute_sql_file(connection, "delete_user_roles.sql")
-    ## execute_sql_file(connection, "clear_data.sql")
+    execute_sql_file(connection, "./sql/delete_permissions.sql")
+    execute_sql_file(connection, "./sql/delete_database.sql")
+    execute_sql_file(connection, "./sql/delete_user_roles.sql")
 
 def execute_sql_file(connection, sql_file):
     """
