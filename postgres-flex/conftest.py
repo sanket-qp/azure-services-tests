@@ -1,9 +1,8 @@
 from string import Template
-import config
-import sys
+
+import common
 
 import pytest
-import psycopg2
 
 def pytest_addoption(parser):
     """
@@ -31,26 +30,18 @@ def connection_params(pytestconfig):
         'password': pytestconfig.getoption("admin_password")
     }
 
-def connect_to_db(host, port, database, user, password):
-    return psycopg2.connect(host=host,
-                            port=port,
-                            database=database,
-                            user=user,
-                            password=password)
-
 @pytest.fixture(scope='module')
 def admin_connection(connection_params):
     """
     Fixture that returns postgres connection as an admin user
     """
     try:
-        conn = connect_to_db(host=connection_params['host'],
+        conn = common.get_db_connection(host=connection_params['host'],
                             port=connection_params['port'],
                             database=connection_params['database'],
                             user=connection_params['user'],
                             password=connection_params['password'])
         print ("got an admin connection")
-        conn.set_session(autocommit=True)
         yield conn
     finally:
         conn.close()
@@ -72,14 +63,13 @@ def create_database_and_connect(admin_connection, connection_params):
     """
     clear_database(admin_connection)
     execute_sql_file(admin_connection, "./sql/create_database.sql")
-    new_db = config.get_db_name()
+    new_db = common.get_db_name()
     try:
-        new_conn = connect_to_db(host=connection_params['host'],
+        new_conn = common.get_db_connection(host=connection_params['host'],
                             port=connection_params['port'],
                             database=new_db,
                             user=connection_params['user'],
                             password=connection_params['password'])
-        new_conn.set_session(autocommit=True)
         yield new_conn
     finally:
         print ("Closing new_conn")
@@ -88,7 +78,7 @@ def create_database_and_connect(admin_connection, connection_params):
 @pytest.fixture(scope='module')
 def db_connection(create_database_and_connect):
     """
-    Fixture that loads the data using admin connection
+    Fixture that loads the data in to sample application database and returns the connection 
     """
     try:
         connection = create_database_and_connect
@@ -124,10 +114,10 @@ def execute_sql_file(connection, sql_file):
     with open(sql_file) as f:
         sql_template = f.read()
         sql = Template(sql_template).safe_substitute(
-            {'appname': config.APP_NAME, 'appfunc': config.APP_NAME})
+            {'appname': common.APP_NAME, 'appfunc': common.APP_NAME})
         with connection.cursor() as cur:
             #print (sql)
             #print ("--------")
             rtn = cur.execute(sql)
             #print ("return: %s" % rtn)
-    print ("---------------------------------------------------------")                                
+    print ("---------------------------------------------------------")

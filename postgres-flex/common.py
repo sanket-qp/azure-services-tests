@@ -1,3 +1,5 @@
+import psycopg2
+
 APP_NAME = "mysimpleblog"
 
 def get_schema_name():
@@ -47,3 +49,15 @@ def get_app_dql_user():
 
 def get_app_dql_role():
     return "wf_%s_pg_app_dql_role" % (APP_NAME)
+
+def get_db_connection(host, port, database, user, password):
+    """
+    Returns a postgres connection object for given parameters
+    """
+    conn = psycopg2.connect(host=host,
+                            port=port,
+                            database=database,
+                            user=user,
+                            password=password)
+    conn.set_session(autocommit=True)
+    return conn

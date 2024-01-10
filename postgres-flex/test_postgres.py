@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-import config
+import common
 
 import psycopg2
 
@@ -22,8 +22,8 @@ class TestPostgres:
         Tests select query
         """
         with db_connection.cursor() as cur:
-            print ('SELECT * from %s' % config.get_article_table_name());
-            cur.execute('SELECT * from %s' % config.get_article_table_name())
+            print ('SELECT * from %s' % common.get_article_table_name());
+            cur.execute('SELECT * from %s' % common.get_article_table_name())
             x = cur.fetchall()
             print (x)
             assert 2 == len(x)
