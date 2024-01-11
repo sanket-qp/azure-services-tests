@@ -81,7 +81,7 @@ def dql_user_connection(connection_params):
 @pytest.fixture(scope='module')
 def create_database_and_connect(admin_connection, connection_params):
     """
-    Fixture that creates an application database and connects to it
+    Fixture that creates an application database and connects to it using admin user
     """
     clear_database(admin_connection)
     execute_sql_file(admin_connection, "./sql/create_database.sql")
@@ -110,13 +110,49 @@ def db_connection(create_database_and_connect):
         ## clear_database(admin_connection)
         print ("Clearning data")
 
+
+@pytest.fixture(scope='function')
+def load_data(connection_params, admin_connection, user_tuple):
+    """
+    A Fixture that runs before each test and loads the data using the user `load_us_user`
+    and returns a database connection using `connect_as_user`
+
+    :param user_tuple: a tuple of user names, 
+                first element specifies the user to load the data
+                second element specifies the user to connect as after data is loaded
+    """
+    try:
+        print ("HELLO:", user_tuple)
+        print ("connection params:", connection_params)
+        load_as_user = user_tuple[0]
+        connect_as_user = user_tuple[1]
+
+        load_as_connection = common.get_db_connection(host=connection_params['host'],
+                                port=connection_params['port'],
+                                database=common.get_db_name(),
+                                user=load_as_user,
+                                password=connection_params['password'])
+
+        execute_sql_file(load_as_connection, "./sql/create_tables.sql")
+        connect_as_connection = common.get_db_connection(host=connection_params['host'],
+                                port=connection_params['port'],
+                                database=common.get_db_name(),
+                                user=connect_as_user,
+                                password=connection_params['password'])
+
+        yield connect_as_connection
+    finally:
+        execute_sql_file(admin_connection, "./sql/delete_tables.sql")
+        load_as_connection.close()
+        connect_as_connection.close()        
+
 def prepare_database(connection):
     """
     Prepares a postgres schema by executing the sql files
     """
     execute_sql_file(connection, "./sql/create_user_roles.sql")
     execute_sql_file(connection, "./sql/create_permissions.sql")
-    execute_sql_file(connection, "./sql/create_tables.sql")
+    ## execute_sql_file(connection, "./sql/create_tables.sql")
 
 def clear_database(connection):
     """
@@ -126,6 +162,7 @@ def clear_database(connection):
     execute_sql_file(connection, "./sql/delete_permissions.sql")
     execute_sql_file(connection, "./sql/delete_database.sql")
     execute_sql_file(connection, "./sql/delete_user_roles.sql")
+    execute_sql_file(connection, "./sql/delete_tables.sql")
 
 def execute_sql_file(connection, sql_file):
     """
@@ -138,8 +175,8 @@ def execute_sql_file(connection, sql_file):
         sql = Template(sql_template).safe_substitute(
             {'appname': common.APP_NAME, 'appfunc': common.APP_NAME})
         with connection.cursor() as cur:
-            #print (sql)
-            #print ("--------")
+            print (sql)
+            print ("--------")
             rtn = cur.execute(sql)
-            #print ("return: %s" % rtn)
+            print ("return: %s" % rtn)
     print ("---------------------------------------------------------")

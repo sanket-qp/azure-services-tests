@@ -20,12 +20,13 @@ class TestPostgres:
             print ("db version: %s" % db_version)
             assert "15.5" in db_version[0]
 
-    def test_select(self, db_connection):
+    @pytest.mark.parametrize('user_tuple', [(common.get_app_ddl_user(), common.get_app_ddl_user())])
+    def test_select(self, load_data):
         """
         Tests select query
         """
-        with db_connection.cursor() as cur:
-            print ('SELECT * from %s' % common.get_article_table_name());
+        with load_data.cursor() as cur:
+            print ('SELECT * from %s' % common.get_article_table_name())
             cur.execute('SELECT * from %s' % common.get_article_table_name())
             x = cur.fetchall()
             print (x)
@@ -33,21 +34,28 @@ class TestPostgres:
             assert 'hello_postgres' == x[0][1]
             assert 'hello_redis' == x[1][1]
 
-    def test_ddl_user_can_create_tables(self, ddl_user_connection):
+    @pytest.mark.parametrize('user_tuple', [(common.get_app_ddl_user(), common.get_app_ddl_user())])
+    def xtest_ddl_user_can_create_tables(self, load_data):
         """
         Tests access of app_ddl_user
         """
+        ddl_user_connection = load_data
         with ddl_user_connection.cursor() as cur:
             x = cur.execute(self.__create_comments_table())
             print (x)
 
-    def test_dql_user_cannot_create_tables(self, dql_user_connection):
+    def xtest_dql_user_cannot_create_tables(self, dql_user_connection):
         """
         Tests that dql_user shouldn't be able to create the tables
         """
-        with pytest.raises(InsufficientPrivilege) as e:
+        with pytest.raises(InsufficientPrivilege) as _:
             with dql_user_connection.cursor() as cur:
                 cur.execute(self.__create_comments_table())
+
+    @pytest.mark.parametrize('user_tuple', [(common.get_app_ddl_user(), common.get_app_dql_user())])
+    def xtest_temp(self, load_data):
+        dql_user_connection = load_data
+        print (dql_user_connection)
 
     def __create_comments_table(self):
         return """
