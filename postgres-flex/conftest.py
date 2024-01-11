@@ -4,14 +4,16 @@ import common
 
 import pytest
 
+import sys
+
 def pytest_addoption(parser):
     """
     Command line arguments specifying postgres connection parameters
     """
     parser.addoption("--host", action="store", default="localhost", help="postgres host")
     parser.addoption("--port", action="store", default=5432, help="postgres port")
-    parser.addoption("--dbname", action="store", default="test_database", help="database name")
-    parser.addoption("--admin_user", action="store", default="sanket",
+    parser.addoption("--dbname", action="store", default="postgres", help="database name")
+    parser.addoption("--admin_user", action="store", default="postgres",
                      help="postgres admin username")
     parser.addoption("--admin_password", action="store", default="",
                      help="postgres admin user's password")
@@ -68,6 +70,7 @@ def dql_user_connection(connection_params):
     Fixture that returns postgres connection as a read_only user
     """
     try:
+        new_conn = None
         new_conn = common.get_db_connection(host=connection_params['host'],
                     port=connection_params['port'],
                     database=common.get_db_name(),
@@ -75,7 +78,8 @@ def dql_user_connection(connection_params):
                     password=connection_params['password'])
         yield new_conn
     finally:
-        new_conn.close()
+        if new_conn:
+            new_conn.close()
 
 
 @pytest.fixture(scope='module')
@@ -106,7 +110,8 @@ def populate_data(connection_params):
         conn = common.get_db_connection(host=connection_params['host'],
                         port=connection_params['port'],
                         database=common.get_db_name(),
-                        user=connection_params['user'],
+                        user=common.get_app_ddl_user(),
+                        # user=connection_params['user'],
                         password=connection_params['password'])
         execute_sql_file(conn, "./sql/create_tables.sql")
         yield conn
@@ -155,8 +160,8 @@ def execute_sql_file(connection, sql_file):
         sql = Template(sql_template).safe_substitute(
             {'appname': common.APP_NAME, 'appfunc': common.APP_NAME})
         with connection.cursor() as cur:
-            #print (sql)
-            #print ("--------")
+            print (sql)
+            print ("--------")
             rtn = cur.execute(sql)
             #print ("return: %s" % rtn)
     print ("---------------------------------------------------------")

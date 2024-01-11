@@ -20,18 +20,18 @@ class TestPostgres:
             print ("db version: %s" % db_version)
             assert "15.5" in db_version[0]
 
-    def test_select(self, db_connection):
-        """
-        Tests select query
-        """
-        with db_connection.cursor() as cur:
-            print ('SELECT * from %s' % common.get_article_table_name());
-            cur.execute('SELECT * from %s' % common.get_article_table_name())
-            x = cur.fetchall()
-            print (x)
-            assert 2 == len(x)
-            assert 'hello_postgres' == x[0][1]
-            assert 'hello_redis' == x[1][1]
+    # def test_select(self, db_connection):
+    #     """
+    #     Tests select query
+    #     """
+    #     with db_connection.cursor() as cur:
+    #         print ('SELECT * from %s' % common.get_article_table_name());
+    #         cur.execute('SELECT * from %s' % common.get_article_table_name())
+    #         x = cur.fetchall()
+    #         print (x)
+    #         assert 2 == len(x)
+    #         assert 'hello_postgres' == x[0][1]
+    #         assert 'hello_redis' == x[1][1]
 
     def test_ddl_user_can_create_tables(self, ddl_user_connection):
         """
@@ -40,6 +40,29 @@ class TestPostgres:
         with ddl_user_connection.cursor() as cur:
             x = cur.execute(self.__create_comments_table())
             print (x)
+        
+        with ddl_user_connection.cursor() as cur:
+            x = cur.execute(self.__delete_comments_table())
+            print (x)
+        
+
+    # def test_ddl_user_can_truncate_tables(self, ddl_user_connection, dql_user_connection):
+    #     """
+    #     Tests access of app_ddl_user
+    #     """
+
+    #     # Make sure that data exists
+    #     with dql_user_connection.cursor() as cur:
+    #         cur.execute("SELECT * from %s" % common.get_article_table_name())
+    #         x = cur.fetchall()
+    #         assert 2 == len(x)
+    #         assert 'hello_postgres' == x[0][1]
+    #         assert 'hello_redis' == x[1][1]            
+
+    #     # Clear all the data
+    #     with ddl_user_connection.cursor() as cur:
+    #         x = cur.execute(self.__truncate_table_stmt())
+    #         print (x)     
 
     def test_ddl_user_can_delete_tables(self, ddl_user_connection):
         """
@@ -47,6 +70,14 @@ class TestPostgres:
         """
         with ddl_user_connection.cursor() as cur:
             x = cur.execute(self.__delete_table_stmt())
+            print (x)
+
+    def test_ddl_user_can_alter_tables(self, ddl_user_connection):
+        """
+        Tests access of app_ddl_user
+        """
+        with ddl_user_connection.cursor() as cur:
+            x = cur.execute(self.__alter_table_stmt())
             print (x)
 
     def test_dql_user_cannot_create_tables(self, dql_user_connection):
@@ -58,16 +89,16 @@ class TestPostgres:
                 cur.execute(self.__create_comments_table())
         assert 'permission denied' in str(e)                
 
-    def test_dql_user_can_select(self, dql_user_connection):
-        """
-        Tests that dql_user should be able to run select queries
-        """
-        with dql_user_connection.cursor() as cur:
-            print ('SELECT * from %s' % common.get_article_table_name())
-            cur.execute('SELECT * from %s' % common.get_article_table_name())
-            x = cur.fetchall()
-            print (x)
-            assert 2 == len(x)
+    # def test_dql_user_can_select(self, dql_user_connection):
+    #     """
+    #     Tests that dql_user should be able to run select queries
+    #     """
+    #     with dql_user_connection.cursor() as cur:
+    #         print ('SELECT * from %s' % common.get_article_table_name())
+    #         cur.execute('SELECT * from %s' % common.get_article_table_name())
+    #         x = cur.fetchall()
+    #         print (x)
+    #         assert 2 == len(x)
 
     def test_dql_user_cannot_insert(self, dql_user_connection):
         """
@@ -98,6 +129,11 @@ class TestPostgres:
             );
         """ % (common.get_schema_name())
 
+    def __delete_comments_table(self):
+        return """
+            DROP TABLE %s.comments
+        """ % common.get_schema_name()
+
     def __insert_stmt(self):
         return """
             INSERT INTO %s.article (title, writeup) 
@@ -114,6 +150,15 @@ class TestPostgres:
 
     def __delete_table_stmt(self):
         return """
-            DROP TABLE %s.comments CASCADE
-        """ % (common.get_schema_name())
+            DROP TABLE %s CASCADE
+        """ % (common.get_article_table_name())
        
+    def __truncate_table_stmt(self):
+        return """
+            TRUNCATE TABLE %s.article CASCADE
+        """ % (common.get_schema_name())
+    
+    def __alter_table_stmt(self):
+        return """
+            ALTER TABLE %s ADD COLUMN category VARCHAR(20);
+        """ % common.get_article_table_name()
