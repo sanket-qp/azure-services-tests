@@ -97,6 +97,23 @@ def create_database_and_connect(admin_connection, connection_params):
         print ("Closing new_conn")
         new_conn.close()
 
+@pytest.fixture(scope='function', autouse=True)
+def populate_data(connection_params):
+    """
+    A Fixture that runs before each test to set up database tables
+    """
+    try:
+        conn = common.get_db_connection(host=connection_params['host'],
+                        port=connection_params['port'],
+                        database=common.get_db_name(),
+                        user=connection_params['user'],
+                        password=connection_params['password'])
+        execute_sql_file(conn, "./sql/create_tables.sql")
+        yield conn
+        execute_sql_file(conn, "./sql/delete_tables.sql")
+    finally:
+        conn.close()
+
 @pytest.fixture(scope='module')
 def db_connection(create_database_and_connect):
     """
@@ -116,7 +133,7 @@ def prepare_database(connection):
     """
     execute_sql_file(connection, "./sql/create_user_roles.sql")
     execute_sql_file(connection, "./sql/create_permissions.sql")
-    execute_sql_file(connection, "./sql/create_tables.sql")
+    ## execute_sql_file(connection, "./sql/create_tables.sql")
 
 def clear_database(connection):
     """

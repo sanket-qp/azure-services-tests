@@ -1,0 +1,1 @@
+DROP TABLE ${appfunc}_schema.article;

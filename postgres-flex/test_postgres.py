@@ -47,6 +47,7 @@ class TestPostgres:
         """
         with ddl_user_connection.cursor() as cur:
             x = cur.execute(self.__delete_table_stmt())
+            print (x)
 
     def test_dql_user_cannot_create_tables(self, dql_user_connection):
         """
