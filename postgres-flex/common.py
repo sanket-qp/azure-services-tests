@@ -33,19 +33,19 @@ def get_ops_readonly_role():
     return "wf_%s_pg_ops_readonly_role" % (APP_NAME)
 
 def get_app_ddl_user():
-    return "wf_%s_pg_app_ddl_user" % (APP_NAME)
+    return "wf_%s_pg_app_ddl" % (APP_NAME)
 
 def get_app_ddl_role():
     return "wf_%s_pg_app_ddl_role" % (APP_NAME)
 
 def get_app_dml_user():
-    return "wf_%s_pg_app_dml_user" % (APP_NAME)
+    return "wf_%s_pg_app_dml" % (APP_NAME)
 
 def get_app_dml_role():
     return "wf_%s_pg_app_dml_role" % (APP_NAME)
 
 def get_app_dql_user():
-    return "wf_%s_pg_app_dql_user" % (APP_NAME)
+    return "wf_%s_pg_app_dql" % (APP_NAME)
 
 def get_app_dql_role():
     return "wf_%s_pg_app_dql_role" % (APP_NAME)

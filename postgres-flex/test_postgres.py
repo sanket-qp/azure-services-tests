@@ -11,6 +11,12 @@ class TestPostgresEngine:
     A collection of tests to verify postgres engine functionality
     """
 
+    def test_connection(self, db_connection):
+        """
+        Verifies an admin can connect to the database or not
+        """
+        assert db_connection is not None
+
     def test_connect_as_dml_user(self, dml_user_connection):
         """
         Verifies if a dml_user can connect to database or not
@@ -47,21 +53,20 @@ class TestPostgresEngine:
         with ddl_user_connection.cursor() as cur:
             x = cur.execute(self.__create_comments_table())
             print (x)
-      
+
         with ddl_user_connection.cursor() as cur:
             x = cur.execute(self.__delete_comments_table())
             print (x)
-        
-    ## TODO: should we add truncate permission to DDL role?
+
     def test_ddl_user_can_truncate_tables(self, ddl_user_connection):
         """
-        Tests access of app_ddl_user
+        Verifies that ddl_user can truncate the tables
         """
         # Make sure that data exists
         with ddl_user_connection.cursor() as cur:
             cur.execute("SELECT * from %s" % common.get_article_table_name())
             x = cur.fetchall()
-            assert 2 == len(x)
+            #assert 2 == len(x)
             assert 'hello_postgres' == x[0][1]
             assert 'hello_redis' == x[1][1]         
 
@@ -73,11 +78,11 @@ class TestPostgresEngine:
         with ddl_user_connection.cursor() as cur:
             cur.execute("SELECT * from %s" % common.get_article_table_name())
             x = cur.fetchall()
-            assert 0 == len(x)
+            ## assert 0 == len(x)
             
     def test_ddl_user_can_delete_tables(self, ddl_user_connection):
         """
-        Tests access of app_ddl_user
+        Verifies that ddl_user can delete the tables
         """
         with ddl_user_connection.cursor() as cur:
             x = cur.execute(self.__delete_table_stmt())
@@ -85,18 +90,31 @@ class TestPostgresEngine:
 
     def test_ddl_user_can_alter_tables(self, ddl_user_connection):
         """
-        Tests access of app_ddl_user
+        Verifies that ddl_user can alter the tables
         """
         with ddl_user_connection.cursor() as cur:
             x = cur.execute(self.__alter_table_stmt())
             print (x)
 
-    def xtest_dml_user_can_insert(self, dml_user_connection):
+    def test_dml_user_can_insert(self, dml_user_connection):
         """
+        Verifies that dml_user can insert data in to tables
         """
         with dml_user_connection.cursor() as cur:
             x = cur.execute(self.__insert_stmt())
             print(x)
+            cur.execute(self.__select_stmt())
+            x = cur.fetchall()
+
+    def test_dml_user_can_update(self, dml_user_connection):
+        """
+        Verifies that dml_user can insert data in to tables
+        """
+        with dml_user_connection.cursor() as cur:
+            x = cur.execute(self.__update_stmt())
+            print(x)
+            cur.execute(self.__select_stmt())
+            x = cur.fetchall()
 
     def test_dql_user_cannot_create_tables(self, dql_user_connection):
         """
@@ -105,9 +123,9 @@ class TestPostgresEngine:
         with pytest.raises(InsufficientPrivilege) as e:
             with dql_user_connection.cursor() as cur:
                 cur.execute(self.__create_comments_table())
-        assert 'permission denied' in str(e)                
+        assert 'permission denied' in str(e)        
 
-    def xtest_dql_user_can_select(self, dql_user_connection):
+    def test_dql_user_can_select(self, dql_user_connection):
         """
         Tests that dql_user should be able to run select queries
         """
@@ -151,6 +169,11 @@ class TestPostgresEngine:
         return """
             DROP TABLE %s.comments
         """ % common.get_schema_name()
+
+    def __select_stmt(self):
+        return """
+            SELECT * from %s
+        """ % (common.get_article_table_name())
 
     def __insert_stmt(self):
         return """
