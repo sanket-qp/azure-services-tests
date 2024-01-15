@@ -206,7 +206,7 @@ def execute_sql_file(connection, sql_file):
     executes commands in the given sql file
     """
     print ("---------------------------------------------------------")
-    print ("executing: %s" % sql_file)
+    print (f"executing: {sql_file}")
     with open(sql_file) as f:
         sql_template = f.read()
         sql = Template(sql_template).safe_substitute(
