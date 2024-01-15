@@ -51,7 +51,7 @@ class TestPostgresEngine:
         """
         Verifies that ddl_user can truncate the tables
         """
-        # Make sure that data exists
+        # Make sure that the data exists
         with ddl_user_connection.cursor() as cur:
             cur.execute(f"SELECT * from {common.get_article_table_name()}")
             rs = cur.fetchall()
@@ -130,6 +130,19 @@ class TestPostgresEngine:
             rs = cur.fetchall()
             assert 'redis is cool' == rs[-1][2]
 
+    def test_dml_user_can_truncate_table(self, dml_user_connection):
+        """
+        Tests access of app_ddl_user
+        """
+        with dml_user_connection.cursor() as cur:
+            cur.execute(self.__truncate_table_stmt())
+        
+        # Verify that there are no rows in the table
+        with dml_user_connection.cursor() as cur:
+            cur.execute(f"SELECT * from {common.get_article_table_name()}")
+            rs = cur.fetchall()
+            assert 0 == len(rs)
+
     @pytest.mark.negative
     def test_dml_user_cannot_create_table(self, dml_user_connection):
         """
@@ -151,14 +164,14 @@ class TestPostgresEngine:
         assert "must be owner of table" in str(e)
 
     @pytest.mark.negative
-    def test_dql_user_cannot_create_tables(self, dql_user_connection):
+    def test_dml_user_cannot_alter_table(self, dml_user_connection):
         """
-        Tests that dql_user shouldn't be able to create the tables
+        Tests access of app_ddl_user
         """
         with pytest.raises(InsufficientPrivilege) as e:
-            with dql_user_connection.cursor() as cur:
-                cur.execute(self.__create_comments_table(common.get_schema_name()))
-        assert 'permission denied' in str(e)  
+            with dml_user_connection.cursor() as cur:
+                cur.execute(self.__alter_table_stmt())
+        assert "must be owner of table" in str(e)
 
     def test_dql_user_can_select(self, dql_user_connection):
         """
@@ -168,6 +181,16 @@ class TestPostgresEngine:
             cur.execute(f"SELECT * from {common.get_article_table_name()}")
             x = cur.fetchall()
             assert 2 == len(x)
+
+    @pytest.mark.negative
+    def test_dql_user_cannot_create_tables(self, dql_user_connection):
+        """
+        Tests that dql_user shouldn't be able to create the tables
+        """
+        with pytest.raises(InsufficientPrivilege) as e:
+            with dql_user_connection.cursor() as cur:
+                cur.execute(self.__create_comments_table(common.get_schema_name()))
+        assert 'permission denied' in str(e)  
 
     @pytest.mark.negative
     def test_dql_user_cannot_insert(self, dql_user_connection):

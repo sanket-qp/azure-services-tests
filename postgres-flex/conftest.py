@@ -4,7 +4,6 @@ import common
 
 import pytest
 
-import sys
 
 def pytest_addoption(parser):
     """
