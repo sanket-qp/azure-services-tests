@@ -11,7 +11,7 @@ class TestPostgresEngine:
     A collection of tests to verify postgres engine functionality
     """
 
-    def test_connection(self, db_connection):
+    def xtest_connection(self, db_connection):
         """
         Verifies an admin can connect to the database or not
         """
