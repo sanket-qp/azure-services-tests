@@ -3,52 +3,52 @@ import psycopg2
 APP_NAME = "mysimpleblog"
 
 def get_schema_name():
-    return "%s_schema" % APP_NAME
+    return f"{APP_NAME}_schema"
 
 def get_db_name():
-    return "%s_db" % APP_NAME
+    return f"{APP_NAME}_db"
 
 def get_article_table_name():
-    return "%s.article" % get_schema_name()
+    return f"{get_schema_name()}.article"
 
 def get_password():
     return "s3cr3t!"
 
 def get_ops_readwrite_user():
-    return "wf_%s_pg_ops_readwrite_user" % (APP_NAME)
+    return f"wf_{APP_NAME}_pg_ops_readwrite_user"
 
 def get_ops_readwrite_tool_user():
-    return "wf_%s_pg_ops_readwrite_tool_user" % (APP_NAME)
+    return f"wf_{APP_NAME}_pg_ops_readwrite_tool_user"
 
 def get_ops_readwrite_role():
-    return "wf_%s_pg_ops_readwrite_role" % (APP_NAME)
+    return f"wf_{APP_NAME}_pg_ops_readwrite_role"
 
 def get_ops_readonly_user():
-    return "wf_%s_pg_ops_readonly_user" % (APP_NAME)
+    return f"wf_{APP_NAME}_pg_ops_readonly_user"
 
 def get_ops_readonly_tool_user():
-    return "wf_%s_pg_ops_readonly_tool_user" % (APP_NAME)
+    return f"wf_{APP_NAME}_pg_ops_readonly_tool_user"
 
 def get_ops_readonly_role():
-    return "wf_%s_pg_ops_readonly_role" % (APP_NAME)
+    return f"wf_{APP_NAME}_pg_ops_readonly_role"
 
 def get_app_ddl_user():
-    return "wf_%s_pg_app_ddl" % (APP_NAME)
+    return f"wf_{APP_NAME}_pg_app_ddl"
 
 def get_app_ddl_role():
-    return "wf_%s_pg_app_ddl_role" % (APP_NAME)
+    return f"wf_{APP_NAME}_pg_app_ddl_role"
 
 def get_app_dml_user():
-    return "wf_%s_pg_app_dml" % (APP_NAME)
+    return f"wf_{APP_NAME}_pg_app_dml"
 
 def get_app_dml_role():
-    return "wf_%s_pg_app_dml_role" % (APP_NAME)
+    return f"wf_{APP_NAME}_pg_app_dml_role"
 
 def get_app_dql_user():
-    return "wf_%s_pg_app_dql" % (APP_NAME)
+    return f"wf_{APP_NAME}_pg_app_dql"
 
 def get_app_dql_role():
-    return "wf_%s_pg_app_dql_role" % (APP_NAME)
+    return f"wf_{APP_NAME}_pg_app_dql_role"
 
 def get_db_connection(host, port, database, user, password):
     """
