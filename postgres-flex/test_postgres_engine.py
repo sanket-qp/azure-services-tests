@@ -42,7 +42,7 @@ class TestPostgresEngine:
         Tests access of app_ddl_user
         """
         with ddl_user_connection.cursor() as cur:
-            cur.execute(self.__create_comments_table())
+            cur.execute(self.__create_comments_table(common.get_schema_name()))
 
         with ddl_user_connection.cursor() as cur:
             cur.execute(self.__delete_comments_table())
@@ -99,6 +99,16 @@ class TestPostgresEngine:
             assert 'technology' == rs[0][4]
             assert 'technology' == rs[1][4]
 
+    @pytest.mark.negative
+    def test_ddl_user_cannot_create_table_in_public_schema(self, ddl_user_connection):
+        """
+        Tests access of app_ddl_user
+        """
+        with pytest.raises(InsufficientPrivilege) as e:
+            with ddl_user_connection.cursor() as cur:
+                cur.execute(self.__create_comments_table("public"))
+        assert "permission denied for schema public" in str(e)
+
     def test_dml_user_can_insert(self, dml_user_connection):
         """
         Verifies that dml_user can insert data in to tables
@@ -121,14 +131,24 @@ class TestPostgresEngine:
             assert 'redis is cool' == rs[-1][2]
 
     @pytest.mark.negative
+    def test_dml_user_cannot_create_table(self, dml_user_connection):
+        """
+        Tests access of app_ddl_user
+        """
+        with pytest.raises(InsufficientPrivilege) as e:
+            with dml_user_connection.cursor() as cur:
+                cur.execute(self.__create_comments_table(common.get_schema_name()))
+        assert "permission denied" in str(e)
+
+    @pytest.mark.negative
     def test_dql_user_cannot_create_tables(self, dql_user_connection):
         """
         Tests that dql_user shouldn't be able to create the tables
         """
         with pytest.raises(InsufficientPrivilege) as e:
             with dql_user_connection.cursor() as cur:
-                cur.execute(self.__create_comments_table())
-        assert 'permission denied' in str(e)     
+                cur.execute(self.__create_comments_table(common.get_schema_name()))
+        assert 'permission denied' in str(e)  
 
     def test_dql_user_can_select(self, dql_user_connection):
         """
@@ -157,12 +177,11 @@ class TestPostgresEngine:
         with pytest.raises(InsufficientPrivilege) as e:
             with dql_user_connection.cursor() as cur:
                 cur.execute(self.__update_stmt())
-        assert 'permission denied' in str(e)
-        
+        assert 'permission denied' in str(e)    
 
-    def __create_comments_table(self):
+    def __create_comments_table(self, schema_name):
         return f"""
-            CREATE TABLE {common.get_schema_name()}.comments (
+            CREATE TABLE {schema_name}.comments (
                 id bigserial primary key,
                 article_id bigserial NOT NULL,
                 body varchar(128) NOT NULL,
