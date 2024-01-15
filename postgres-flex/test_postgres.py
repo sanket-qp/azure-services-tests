@@ -41,10 +41,10 @@ class TestPostgresEngine:
         Tests access of app_ddl_user
         """
         with ddl_user_connection.cursor() as cur:
-            x = cur.execute(self.__create_comments_table())
+            cur.execute(self.__create_comments_table())
 
         with ddl_user_connection.cursor() as cur:
-            x = cur.execute(self.__delete_comments_table())
+            cur.execute(self.__delete_comments_table())
 
     def test_ddl_user_can_truncate_tables(self, ddl_user_connection):
         """
@@ -53,25 +53,26 @@ class TestPostgresEngine:
         # Make sure that data exists
         with ddl_user_connection.cursor() as cur:
             cur.execute(f"SELECT * from {common.get_article_table_name()}")
-            x = cur.fetchall()
-            assert 2 == len(x)
-            assert 'hello_postgres' == x[0][1]
-            assert 'hello_redis' == x[1][1]
+            rs = cur.fetchall()
+            assert 2 == len(rs)
+            assert 'hello_postgres' == rs[0][1]
+            assert 'hello_redis' == rs[1][1]
 
         # Clear all the data
         with ddl_user_connection.cursor() as cur:
-            x = cur.execute(self.__truncate_table_stmt())
+            cur.execute(self.__truncate_table_stmt())
         
         # Verify that there are no rows in the table
         with ddl_user_connection.cursor() as cur:
             cur.execute(f"SELECT * from {common.get_article_table_name()}")
-            x = cur.fetchall()
-            assert 0 == len(x)
+            rs = cur.fetchall()
+            assert 0 == len(rs)
             
     def test_ddl_user_can_delete_tables(self, ddl_user_connection):
         """
         Verifies that ddl_user can delete the tables
         """
+        # Delete the table
         with ddl_user_connection.cursor() as cur:
             cur.execute(self.__delete_article_table_stmt())
 
@@ -87,33 +88,37 @@ class TestPostgresEngine:
         """
         # Alter the table
         with ddl_user_connection.cursor() as cur:
-            x = cur.execute(self.__alter_table_stmt())
+            cur.execute(self.__alter_table_stmt())
             
         # Verify that new column is added
         with ddl_user_connection.cursor() as cur:
             cur.execute(f"SELECT * from {common.get_article_table_name()}")
-            x  = cur.fetchall()
-            assert 2 == len(x)
-            assert 'technology' == x[0][4]
-            assert 'technology' == x[1][4]
+            rs  = cur.fetchall()
+            assert 2 == len(rs)
+            assert 'technology' == rs[0][4]
+            assert 'technology' == rs[1][4]
 
     def test_dml_user_can_insert(self, dml_user_connection):
         """
         Verifies that dml_user can insert data in to tables
         """
         with dml_user_connection.cursor() as cur:
-            x = cur.execute(self.__insert_stmt())
+            cur.execute(self.__insert_stmt())
             cur.execute(self.__select_stmt())
-            x = cur.fetchall()
+            rs = cur.fetchall()
+            assert 3 == len(rs)
+            assert 'hello_pytest' == rs[-1][1]
+
 
     def test_dml_user_can_update(self, dml_user_connection):
         """
         Verifies that dml_user can insert data in to tables
         """
         with dml_user_connection.cursor() as cur:
-            x = cur.execute(self.__update_stmt())
+            cur.execute(self.__update_stmt())
             cur.execute(self.__select_stmt())
-            x = cur.fetchall()
+            rs = cur.fetchall()
+            assert 'redis is cool' == rs[-1][2]
 
     def test_dql_user_cannot_create_tables(self, dql_user_connection):
         """
@@ -122,7 +127,7 @@ class TestPostgresEngine:
         with pytest.raises(InsufficientPrivilege) as e:
             with dql_user_connection.cursor() as cur:
                 cur.execute(self.__create_comments_table())
-        assert 'permission denied' in str(e)        
+        assert 'permission denied' in str(e)     
 
     def test_dql_user_can_select(self, dql_user_connection):
         """
@@ -178,8 +183,8 @@ class TestPostgresEngine:
     def __update_stmt(self):
         return f"""
             UPDATE {common.get_article_table_name()}
-            SET writeup='testing with pytest is cool'
-            WHERE title='hello_pytest';
+            SET writeup='redis is cool'
+            WHERE title='hello_redis';
         """
 
     def __delete_article_table_stmt(self):
