@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS ${appfunc}_schema.article;
+DROP TABLE IF EXISTS ${appfunc}_schema.article
