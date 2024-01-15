@@ -141,6 +141,16 @@ class TestPostgresEngine:
         assert "permission denied" in str(e)
 
     @pytest.mark.negative
+    def test_dml_user_cannot_delete_table(self, dml_user_connection):
+        """
+        Tests access of app_ddl_user
+        """
+        with pytest.raises(InsufficientPrivilege) as e:
+            with dml_user_connection.cursor() as cur:
+                cur.execute(self.__delete_article_table_stmt())
+        assert "must be owner of table" in str(e)
+
+    @pytest.mark.negative
     def test_dql_user_cannot_create_tables(self, dql_user_connection):
         """
         Tests that dql_user shouldn't be able to create the tables
