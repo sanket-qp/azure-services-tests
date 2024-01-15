@@ -105,7 +105,7 @@ def xcreate_database_and_connect(admin_connection, connection_params):
     Fixture that creates an application database and connects to it
     """
     clear_database(admin_connection)
-    execute_sql_file(admin_connection, "/Users/sanket/Downloads/HelloPostgres/azure-services-tests/postgres-flex/sql/create_database.sql")
+    execute_sql_file(admin_connection, "./sql/create_database.sql")
     new_db = common.get_db_name()
     try:
         new_conn = common.get_db_connection(host=connection_params['host'],
@@ -150,7 +150,7 @@ def populate_data(connection_params, admin_connection):
                         user=common.get_app_ddl_user(),
                         ## user=connection_params['user'],
                         password=connection_params['password'])
-        execute_sql_file(conn, "/Users/sanket/Downloads/HelloPostgres/azure-services-tests/postgres-flex/sql/create_tables.sql")
+        execute_sql_file(conn, "./sql/create_tables.sql")
         yield conn
         execute_sql_file(conn, "./sql/delete_tables.sql")
     finally:
@@ -188,18 +188,17 @@ def prepare_database(connection):
     """
     Prepares a postgres schema by executing the sql files
     """
-    execute_sql_file(connection, "/Users/sanket/Downloads/HelloPostgres/azure-services-tests/postgres-flex/sql/create_user_roles.sql")
-    execute_sql_file(connection, "/Users/sanket/Downloads/HelloPostgres/azure-services-tests/postgres-flex/sql/create_permissions.sql")
-    ## execute_sql_file(connection, "./sql/create_tables.sql")
+    execute_sql_file(connection, "./sql/create_user_roles.sql")
+    execute_sql_file(connection, "./sql/create_permissions.sql")
 
 def clear_database(connection):
     """
     Clears postgres database by executing the `clear_data.sql` file
     """
     print ("clearing data")
-    execute_sql_file(connection, "/Users/sanket/Downloads/HelloPostgres/azure-services-tests/postgres-flex/sql/delete_permissions.sql")
-    execute_sql_file(connection, "/Users/sanket/Downloads/HelloPostgres/azure-services-tests/postgres-flex/sql/delete_database.sql")
-    execute_sql_file(connection, "/Users/sanket/Downloads/HelloPostgres/azure-services-tests/postgres-flex/sql/delete_user_roles.sql")
+    execute_sql_file(connection, "./sql/delete_permissions.sql")
+    execute_sql_file(connection, "./sql/delete_database.sql")
+    execute_sql_file(connection, "./sql/delete_user_roles.sql")
 
 def execute_sql_file(connection, sql_file):
     """
