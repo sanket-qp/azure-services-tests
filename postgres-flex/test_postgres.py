@@ -4,7 +4,7 @@ import common
 
 import pytest
 import psycopg2
-from psycopg2.errors import InsufficientPrivilege
+from psycopg2.errors import InsufficientPrivilege, UndefinedTable
 
 class TestPostgresEngine:
     """
@@ -73,28 +73,41 @@ class TestPostgresEngine:
         # Clear all the data
         with ddl_user_connection.cursor() as cur:
             x = cur.execute(self.__truncate_table_stmt())
-            print (x)
         
+        # Verify that there are no rows in the table
         with ddl_user_connection.cursor() as cur:
             cur.execute(f"SELECT * from {common.get_article_table_name()}")
             x = cur.fetchall()
-            ## assert 0 == len(x)
+            assert 0 == len(x)
             
     def test_ddl_user_can_delete_tables(self, ddl_user_connection):
         """
         Verifies that ddl_user can delete the tables
         """
         with ddl_user_connection.cursor() as cur:
-            x = cur.execute(self.__delete_article_table_stmt())
-            print (x)
+            cur.execute(self.__delete_article_table_stmt())
+
+        # Query and make sure that table doesn't exist
+        with pytest.raises(UndefinedTable) as e:
+            with ddl_user_connection.cursor() as cur:
+                cur.execute(f"SELECT * from {common.get_article_table_name()}")
+        assert "does not exist" in str(e)
 
     def test_ddl_user_can_alter_tables(self, ddl_user_connection):
         """
         Verifies that ddl_user can alter the tables
         """
+        # Alter the table
         with ddl_user_connection.cursor() as cur:
             x = cur.execute(self.__alter_table_stmt())
-            print (x)
+            
+        # Verify that new column is added
+        with ddl_user_connection.cursor() as cur:
+            cur.execute(f"SELECT * from {common.get_article_table_name()}")
+            x  = cur.fetchall()
+            assert 2 == len(x)
+            assert 'technology' == x[0][4]
+            assert 'technology' == x[1][4]
 
     def test_dml_user_can_insert(self, dml_user_connection):
         """
@@ -192,4 +205,6 @@ class TestPostgresEngine:
         return f"TRUNCATE TABLE {common.get_article_table_name()}"""
   
     def __alter_table_stmt(self):
-        return f"ALTER TABLE {common.get_article_table_name()} ADD COLUMN category VARCHAR(20)"
+        return f"""ALTER TABLE {common.get_article_table_name()} 
+            ADD COLUMN category VARCHAR(20) DEFAULT 'technology'
+            """
