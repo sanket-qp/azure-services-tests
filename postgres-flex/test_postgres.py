@@ -6,6 +6,7 @@ import pytest
 import psycopg2
 from psycopg2.errors import InsufficientPrivilege, UndefinedTable
 
+@pytest.mark.engine
 class TestPostgresEngine:
     """
     A collection of tests to verify postgres engine functionality
@@ -109,7 +110,6 @@ class TestPostgresEngine:
             assert 3 == len(rs)
             assert 'hello_pytest' == rs[-1][1]
 
-
     def test_dml_user_can_update(self, dml_user_connection):
         """
         Verifies that dml_user can insert data in to tables
@@ -120,6 +120,7 @@ class TestPostgresEngine:
             rs = cur.fetchall()
             assert 'redis is cool' == rs[-1][2]
 
+    @pytest.mark.negative
     def test_dql_user_cannot_create_tables(self, dql_user_connection):
         """
         Tests that dql_user shouldn't be able to create the tables
@@ -138,6 +139,7 @@ class TestPostgresEngine:
             x = cur.fetchall()
             assert 2 == len(x)
 
+    @pytest.mark.negative
     def test_dql_user_cannot_insert(self, dql_user_connection):
         """
         Tests that verifies that dql_user shouldn't be able to insert data
@@ -147,6 +149,7 @@ class TestPostgresEngine:
                 cur.execute(self.__insert_stmt())
         assert 'permission denied' in str(e)
 
+    @pytest.mark.negative
     def test_dql_user_cannot_update(self, dql_user_connection):
         """
         Tests that verifies that dql_user shouldn't be able to insert data
