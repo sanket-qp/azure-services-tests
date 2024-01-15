@@ -43,11 +43,9 @@ def admin_connection(connection_params):
                             database=connection_params['database'],
                             user=connection_params['user'],
                             password=connection_params['password'])
-        print ("got an admin connection")
         yield conn
     finally:
         conn.close()
-        print ("closing an admin connection")
 
 @pytest.fixture(scope='module')
 def ddl_user_connection(connection_params):
@@ -103,8 +101,10 @@ def create_database_and_connect(admin_connection, connection_params):
     """
     Fixture that creates an application database and connects to it
     """
-    execute_sql_file(admin_connection, "./sql/script1.sql")
+    # Create users and database
+    execute_sql_file(admin_connection, "./sql/create_users_and_database.sql")
     
+    # Connect to the created database
     try:
         new_conn = common.get_db_connection(host=connection_params['host'],
                             port=connection_params['port'],
@@ -112,10 +112,10 @@ def create_database_and_connect(admin_connection, connection_params):
                             user=connection_params['user'],
                             password=connection_params['password'])
         
-        execute_sql_file(new_conn, "./sql/script2.sql")
+        # Create permissions for the users
+        execute_sql_file(new_conn, "./sql/grant_permissions.sql")
         yield new_conn
     finally:
-        print ("Closing new_conn")
         new_conn.close()
 
 @pytest.fixture(scope='function', autouse=True)

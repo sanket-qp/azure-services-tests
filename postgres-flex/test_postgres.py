@@ -10,19 +10,11 @@ class TestPostgresEngine:
     """
     A collection of tests to verify postgres engine functionality
     """
-
-    def xtest_connection(self, db_connection):
-        """
-        Verifies an admin can connect to the database or not
-        """
-        assert db_connection is not None
-
     def test_connect_as_dml_user(self, dml_user_connection):
         """
         Verifies if a dml_user can connect to database or not
         """
         assert dml_user_connection is not None
-        print (dml_user_connection)
         assert common.get_app_dml_user() == dml_user_connection.get_dsn_parameters().get('user')
 
         with dml_user_connection.cursor() as cur:
@@ -35,7 +27,6 @@ class TestPostgresEngine:
         Verifies if a ddl_user can connect to database or not
         """
         assert ddl_user_connection is not None
-        print (ddl_user_connection)
         assert common.get_app_ddl_user() == ddl_user_connection.get_dsn_parameters().get('user')
 
     def test_connect_as_dql_user(self, dql_user_connection):
@@ -43,7 +34,6 @@ class TestPostgresEngine:
         Verifies if a dql_user can connect to database or not
         """
         assert dql_user_connection is not None
-        print (dql_user_connection)
         assert common.get_app_dql_user() == dql_user_connection.get_dsn_parameters().get('user')
 
     def test_ddl_user_can_create_tables(self, ddl_user_connection):
@@ -52,11 +42,9 @@ class TestPostgresEngine:
         """
         with ddl_user_connection.cursor() as cur:
             x = cur.execute(self.__create_comments_table())
-            print (x)
 
         with ddl_user_connection.cursor() as cur:
             x = cur.execute(self.__delete_comments_table())
-            print (x)
 
     def test_ddl_user_can_truncate_tables(self, ddl_user_connection):
         """
@@ -66,9 +54,9 @@ class TestPostgresEngine:
         with ddl_user_connection.cursor() as cur:
             cur.execute(f"SELECT * from {common.get_article_table_name()}")
             x = cur.fetchall()
-            #assert 2 == len(x)
+            assert 2 == len(x)
             assert 'hello_postgres' == x[0][1]
-            assert 'hello_redis' == x[1][1]  
+            assert 'hello_redis' == x[1][1]
 
         # Clear all the data
         with ddl_user_connection.cursor() as cur:
@@ -115,7 +103,6 @@ class TestPostgresEngine:
         """
         with dml_user_connection.cursor() as cur:
             x = cur.execute(self.__insert_stmt())
-            print(x)
             cur.execute(self.__select_stmt())
             x = cur.fetchall()
 
@@ -125,7 +112,6 @@ class TestPostgresEngine:
         """
         with dml_user_connection.cursor() as cur:
             x = cur.execute(self.__update_stmt())
-            print(x)
             cur.execute(self.__select_stmt())
             x = cur.fetchall()
 
@@ -143,10 +129,8 @@ class TestPostgresEngine:
         Tests that dql_user should be able to run select queries
         """
         with dql_user_connection.cursor() as cur:
-            print (f'SELECT * from {common.get_article_table_name()}')
             cur.execute(f"SELECT * from {common.get_article_table_name()}")
             x = cur.fetchall()
-            print (x)
             assert 2 == len(x)
 
     def test_dql_user_cannot_insert(self, dql_user_connection):
