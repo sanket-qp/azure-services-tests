@@ -6,6 +6,7 @@ import pytest
 import psycopg2
 from psycopg2.errors import InsufficientPrivilege, UndefinedTable
 
+@pytest.mark.functional
 @pytest.mark.engine
 class TestPostgresEngine:
     """
