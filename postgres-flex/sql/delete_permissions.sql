@@ -1,1 +1,0 @@
-DROP SCHEMA IF EXISTS ${appfunc}_schema CASCADE;

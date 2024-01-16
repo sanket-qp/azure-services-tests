@@ -1,4 +1,4 @@
-CREATE TABLE ${appfunc}_schema.article (
+CREATE TABLE IF NOT EXISTS ${appfunc}_schema.article (
     id bigserial primary key,
     title varchar(20) NOT NULL,
     writeup text NOT NULL,
