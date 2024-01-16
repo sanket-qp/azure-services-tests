@@ -11,6 +11,8 @@ ALTER SCHEMA ${appfunc}_schema OWNER TO wf_${appname}_pg_app_ddl;
 GRANT CONNECT ON DATABASE ${appfunc}_db TO wf_${appname}_pg_app_ddl;
 GRANT CONNECT ON DATABASE ${appfunc}_db TO wf_${appname}_pg_app_dml;
 GRANT CONNECT ON DATABASE ${appfunc}_db TO wf_${appname}_pg_app_dql;
+GRANT CONNECT ON DATABASE ${appfunc}_db TO wf_${appname}_pg_ops_readwrite;
+GRANT CONNECT ON DATABASE ${appfunc}_db TO wf_${appname}_pg_ops_readonly;
 
 /* Set the seach path to the database. Tables and other objects in a schema
    can always by referred to like ${appfunc}_schema.table, but setting the

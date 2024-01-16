@@ -211,7 +211,26 @@ class TestPostgresEngine:
         with pytest.raises(InsufficientPrivilege) as e:
             with dql_user_connection.cursor() as cur:
                 cur.execute(self.__update_stmt())
-        assert 'permission denied' in str(e)    
+        assert 'permission denied' in str(e)
+
+    def test_ops_readwrite_user_can_read_pg_stats(self, ops_readwrite_connection):
+        """
+        Verifies that ops_readwrite_user can read pg_stats
+        """
+        with ops_readwrite_connection.cursor() as cur:
+            cur.execute("SELECT * from pg_stat_activity")
+            x = cur.fetchall()
+            assert len(x) > 0
+
+    @pytest.mark.negative
+    def test_ops_readwrite_user_cannot_insert_to_app_schema(self, ops_readwrite_connection):
+        """
+        Verifies that ops_readwrite_user can't insert data in to application tables
+        """
+        with pytest.raises(InsufficientPrivilege) as e:
+            with ops_readwrite_connection.cursor() as cur:
+                cur.execute(self.__insert_stmt())
+        assert 'permission denied for schema' in str(e)
 
     def __create_comments_table(self, schema_name):
         return f"""

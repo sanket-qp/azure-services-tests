@@ -15,7 +15,7 @@ def get_password():
     return "s3cr3t!"
 
 def get_ops_readwrite_user():
-    return f"wf_{APP_NAME}_pg_ops_readwrite_user"
+    return f"wf_{APP_NAME}_pg_ops_readwrite"
 
 def get_ops_readwrite_tool_user():
     return f"wf_{APP_NAME}_pg_ops_readwrite_tool_user"
