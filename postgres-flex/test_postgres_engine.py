@@ -103,7 +103,7 @@ class TestPostgresEngine:
     @pytest.mark.negative
     def test_ddl_user_cannot_create_table_in_public_schema(self, ddl_user_connection):
         """
-        Tests access of app_ddl_user
+        Verifies that ddl_user can't access public schema
         """
         with pytest.raises(InsufficientPrivilege) as e:
             with ddl_user_connection.cursor() as cur:
@@ -123,7 +123,7 @@ class TestPostgresEngine:
 
     def test_dml_user_can_update(self, dml_user_connection):
         """
-        Verifies that dml_user can insert data in to tables
+        Verifies that dml_user can update data in to tables
         """
         with dml_user_connection.cursor() as cur:
             cur.execute(self.__update_stmt())
@@ -133,7 +133,7 @@ class TestPostgresEngine:
 
     def test_dml_user_can_truncate_table(self, dml_user_connection):
         """
-        Tests access of app_ddl_user
+        Verifies that dml_user can truncate tables
         """
         with dml_user_connection.cursor() as cur:
             cur.execute(self.__truncate_table_stmt())
@@ -147,7 +147,7 @@ class TestPostgresEngine:
     @pytest.mark.negative
     def test_dml_user_cannot_create_table(self, dml_user_connection):
         """
-        Tests access of app_ddl_user
+        Verifies that ddl_user can't create tables
         """
         with pytest.raises(InsufficientPrivilege) as e:
             with dml_user_connection.cursor() as cur:
@@ -157,7 +157,7 @@ class TestPostgresEngine:
     @pytest.mark.negative
     def test_dml_user_cannot_delete_table(self, dml_user_connection):
         """
-        Tests access of app_ddl_user
+        Verifies that ddl_user can't delete tables
         """
         with pytest.raises(InsufficientPrivilege) as e:
             with dml_user_connection.cursor() as cur:
@@ -167,7 +167,7 @@ class TestPostgresEngine:
     @pytest.mark.negative
     def test_dml_user_cannot_alter_table(self, dml_user_connection):
         """
-        Tests access of app_ddl_user
+        Verifies that ddl_user can't alter tables
         """
         with pytest.raises(InsufficientPrivilege) as e:
             with dml_user_connection.cursor() as cur:
@@ -176,7 +176,7 @@ class TestPostgresEngine:
 
     def test_dql_user_can_select(self, dql_user_connection):
         """
-        Tests that dql_user should be able to run select queries
+        Verifies that dql_user can query tables
         """
         with dql_user_connection.cursor() as cur:
             cur.execute(f"SELECT * from {common.get_article_table_name()}")
@@ -186,7 +186,7 @@ class TestPostgresEngine:
     @pytest.mark.negative
     def test_dql_user_cannot_create_tables(self, dql_user_connection):
         """
-        Tests that dql_user shouldn't be able to create the tables
+        Verifies that dql_user can't create tables
         """
         with pytest.raises(InsufficientPrivilege) as e:
             with dql_user_connection.cursor() as cur:
@@ -196,7 +196,7 @@ class TestPostgresEngine:
     @pytest.mark.negative
     def test_dql_user_cannot_insert(self, dql_user_connection):
         """
-        Tests that verifies that dql_user shouldn't be able to insert data
+        Verifies that dql_user can't insert in to tables
         """
         with pytest.raises(InsufficientPrivilege) as e:
             with dql_user_connection.cursor() as cur:
@@ -206,7 +206,7 @@ class TestPostgresEngine:
     @pytest.mark.negative
     def test_dql_user_cannot_update(self, dql_user_connection):
         """
-        Tests that verifies that dql_user shouldn't be able to insert data
+        Verifies that dql_user can't update the data in tables
         """
         with pytest.raises(InsufficientPrivilege) as e:
             with dql_user_connection.cursor() as cur:
