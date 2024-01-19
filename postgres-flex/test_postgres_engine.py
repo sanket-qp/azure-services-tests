@@ -38,6 +38,20 @@ class TestPostgresEngine:
         assert dql_user_connection is not None
         assert common.get_app_dql_user() == dql_user_connection.get_dsn_parameters().get('user')
 
+    def test_connect_as_ops_readwrite_user(self, ops_readwrite_connection):
+        """
+        Verifies if a dql_user can connect to database or not
+        """
+        assert ops_readwrite_connection is not None
+        assert common.get_ops_readwrite_user() == ops_readwrite_connection.get_dsn_parameters().get('user')
+
+    def test_connect_as_ops_readonly_user(self, ops_readonly_connection):
+        """
+        Verifies if a dql_user can connect to database or not
+        """
+        assert ops_readonly_connection is not None
+        assert common.get_ops_readonly_user() == ops_readonly_connection.get_dsn_parameters().get('user')
+
     def test_ddl_user_can_create_tables(self, ddl_user_connection):
         """
         Verifies that ddl_user can create tables
@@ -219,8 +233,8 @@ class TestPostgresEngine:
         """
         with ops_readwrite_connection.cursor() as cur:
             cur.execute("SELECT * from pg_stat_activity")
-            x = cur.fetchall()
-            assert len(x) > 0
+            rs = cur.fetchall()
+            assert len(rs) > 0
 
     @pytest.mark.negative
     def test_ops_readwrite_user_cannot_insert_to_app_schema(self, ops_readwrite_connection):
@@ -266,9 +280,10 @@ class TestPostgresEngine:
         return f"DROP TABLE {common.get_article_table_name()} CASCADE"
     
     def __truncate_table_stmt(self):
-        return f"TRUNCATE TABLE {common.get_article_table_name()}"""
+        return f"TRUNCATE TABLE {common.get_article_table_name()}"
   
     def __alter_table_stmt(self):
-        return f"""ALTER TABLE {common.get_article_table_name()} 
+        return f"""
+            ALTER TABLE {common.get_article_table_name()}
             ADD COLUMN category VARCHAR(20) DEFAULT 'technology'
             """

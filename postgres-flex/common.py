@@ -24,7 +24,7 @@ def get_ops_readwrite_role():
     return f"wf_{APP_NAME}_pg_ops_readwrite_role"
 
 def get_ops_readonly_user():
-    return f"wf_{APP_NAME}_pg_ops_readonly_user"
+    return f"wf_{APP_NAME}_pg_ops_readonly"
 
 def get_ops_readonly_tool_user():
     return f"wf_{APP_NAME}_pg_ops_readonly_tool_user"
