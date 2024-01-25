@@ -1,4 +1,10 @@
+import os
+
 import psycopg2
+from dotenv import load_dotenv
+
+
+load_dotenv(".env")
 
 APP_NAME = "mysimpleblog"
 
@@ -12,7 +18,10 @@ def get_article_table_name():
     return f"{get_schema_name()}.article"
 
 def get_password():
-    return "s3cr3t!"
+    return ""
+
+def get_admin_user():
+    return 'pgadmin'
 
 def get_ops_readwrite_user():
     return f"wf_{APP_NAME}_pg_ops_readwrite"

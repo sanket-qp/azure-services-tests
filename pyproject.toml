@@ -11,6 +11,11 @@ python = "^3.8"
 pytest = "^7.4.4"
 psycopg2-binary = "^2.9.9"
 psycopg2-pool = "^1.1"
+azure-identity = "^1.15.0"
+azure-keyvault-keys = "^4.8.0"
+python-dotenv = "^1.0.1"
+requests = "^2.31.0"
+urllib3 = "1.26.6"
 
 
 [build-system]

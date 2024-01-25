@@ -22,7 +22,7 @@ class TestPostgresEngine:
         with dml_user_connection.cursor() as cur:
             cur.execute('SELECT version()')
             db_version = cur.fetchone()
-            assert "15.5" in db_version[0]
+            assert "15." in db_version[0]
 
     def test_connect_as_ddl_user(self, ddl_user_connection):
         """

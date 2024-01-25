@@ -75,6 +75,7 @@ CREATE USER wf_${appname}_pg_ops_readonly WITH
     LOGIN
     NOREPLICATION
     NOBYPASSRLS
+    PASSWORD '${password}'
     CONNECTION LIMIT 2;
 CREATE USER wf_${appname}_pg_ops_readwrite WITH
     NOSUPERUSER
@@ -84,6 +85,7 @@ CREATE USER wf_${appname}_pg_ops_readwrite WITH
     LOGIN
     NOREPLICATION
     NOBYPASSRLS
+    PASSWORD '${password}'
     CONNECTION LIMIT 2;
 
 /* Grant permissions to the operational roles. */
@@ -106,7 +108,8 @@ CREATE ROLE wf_${appname}_pg_app_ddl WITH
     NOINHERIT
     LOGIN
     NOREPLICATION
-    NOBYPASSRLS;
+    NOBYPASSRLS
+    PASSWORD '${password}';
 CREATE ROLE wf_${appname}_pg_app_dml WITH
     NOSUPERUSER
     NOCREATEDB
@@ -114,7 +117,8 @@ CREATE ROLE wf_${appname}_pg_app_dml WITH
     NOINHERIT
     LOGIN
     NOREPLICATION
-    NOBYPASSRLS;
+    NOBYPASSRLS
+    PASSWORD '${password}';
 CREATE ROLE wf_${appname}_pg_app_dql WITH
     NOSUPERUSER
     NOCREATEDB
@@ -122,6 +126,9 @@ CREATE ROLE wf_${appname}_pg_app_dql WITH
     NOINHERIT
     LOGIN
     NOREPLICATION
-    NOBYPASSRLS;
+    NOBYPASSRLS
+    PASSWORD '${password}';
+
+GRANT wf_${appname}_pg_app_ddl to ${admin_user};
 
 CREATE DATABASE ${appfunc}_db;
