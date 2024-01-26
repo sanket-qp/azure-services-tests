@@ -3,8 +3,7 @@ import os
 import psycopg2
 from dotenv import load_dotenv
 
-
-load_dotenv(".env")
+config = load_dotenv(".env")
 
 APP_NAME = "mysimpleblog"
 
@@ -73,3 +72,10 @@ def get_db_connection(host, port, database, user, password):
 
 def get_db_connection_as_user(host, port, get_database_func, get_user_func, password):
     return get_db_connection(host, port, get_database_func(), get_user_func(), password)
+
+def get_key_vault_url():
+    return os.getenv('VAULT_URL', None)
+
+def get_key_valult_key_name():
+    return os.getenv('KEY_NAME', None)
+   
