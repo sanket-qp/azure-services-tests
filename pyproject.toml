@@ -16,6 +16,7 @@ azure-keyvault-keys = "^4.8.0"
 python-dotenv = "^1.0.1"
 requests = "^2.31.0"
 urllib3 = "1.26.6"
+azure-mgmt-rdbms = "^10.1.0"
 
 
 [build-system]

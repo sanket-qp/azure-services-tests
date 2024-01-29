@@ -78,4 +78,15 @@ def get_key_vault_url():
 
 def get_key_valult_key_name():
     return os.getenv('KEY_NAME', None)
-   
+
+def get_resource_group_name():
+    return os.getenv('RESOURCE_GROUP_NAME', None)
+
+def get_subscription_id():
+    return os.getenv('SUBSCRIPTION_ID', None)
+
+def get_postgres_instance_name():
+    return os.getenv("POSTGRES_INSTANCE_NAME", None)   
+
+def get_postgres_instance_identity():
+    return os.getenv("POSTGRES_INSTANCE_IDENTITY", None)
