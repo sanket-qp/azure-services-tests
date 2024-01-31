@@ -21,9 +21,17 @@ pipeline:
                   identifier: echo
                   name: echo
                   spec:
+                    shell: Sh
                     command: echo hello world
                   timeout: ""
                   type: Run
+              - step:
+                  type: Run
+                  name: Install Dependencies
+                  identifier: Install_Dependencies
+                  spec:
+                    shell: Sh
+                    command: poetry install
           platform:
             arch: Amd64
             os: Linux
@@ -31,3 +39,51 @@ pipeline:
             spec: {}
             type: Cloud
         type: CI
+    - stage:
+        name: postprovision
+        identifier: postprovision
+        description: ""
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: ShellScript
+                  name: Run PostProvision Script
+                  identifier: Run_PostProvision_Script
+                  spec:
+                    shell: Bash
+                    executionTarget: {}
+                    source:
+                      type: Inline
+                      spec:
+                        script: cd postgres-flex && pytest
+                    environmentVariables: []
+                    outputVariables: []
+                  timeout: 10m
+            rollbackSteps: []
+          serviceDependencies: []
+        tags: {}
+    - stage:
+        name: Run Tests
+        identifier: Run_Tests
+        description: ""
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: ShellScript
+                  name: ShellScript_1
+                  identifier: ShellScript_1
+                  spec:
+                    shell: Bash
+                    executionTarget: {}
+                    source:
+                      type: Inline
+                      spec:
+                        script: cd postgres-flex && pytest
+                    environmentVariables: []
+                    outputVariables: []
+                  timeout: 10m
+        tags: {}
