@@ -1,0 +1,14 @@
+inputSet:
+  name: Build_sanket_qp_azure_services_tests_1706741944031-pr-trigger-input-set
+  identifier: Build_sanket_qp_azure_services_tests_1706741944031prtriggerinputset
+  orgIdentifier: default
+  projectIdentifier: default_project
+  pipeline:
+    identifier: Build_sanket_qp_azure_services_tests_1706741944031
+    properties:
+      ci:
+        codebase:
+          build:
+            type: PR
+            spec:
+              number: <+trigger.prNumber>
