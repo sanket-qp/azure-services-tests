@@ -40,9 +40,10 @@ pipeline:
                       pytest -v
                       echo "Done"
           platform:
-            arch: Amd64
             os: Linux
+            arch: Amd64
           runtime:
-            spec: {}
             type: Cloud
+            spec: {}
         type: CI
+        description: ""
