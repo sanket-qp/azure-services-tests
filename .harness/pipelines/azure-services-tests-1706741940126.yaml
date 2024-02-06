@@ -37,6 +37,8 @@ pipeline:
                       uname -a
                       pip install poetry
                       poetry install --no-root
+                      echo "Current dir: "
+                      echo `pwd`
                       pytest -v
                       echo "Done"
           platform:
