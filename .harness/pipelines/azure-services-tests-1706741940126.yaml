@@ -38,6 +38,8 @@ pipeline:
                       pip install poetry
                       pip install pytest
                       poetry install --no-root
+                      echo "Activating poetry environment"
+                      poetry shell
                       echo "Current dir: ".`pwd`
                       echo `ls -l`
                       pytest -v
