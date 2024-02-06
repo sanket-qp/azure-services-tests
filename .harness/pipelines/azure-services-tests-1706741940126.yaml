@@ -24,6 +24,21 @@ pipeline:
                     command: echo hello world
                   timeout: ""
                   type: Run
+              - step:
+                  type: Run
+                  name: Run pytest
+                  identifier: Run_pytest
+                  spec:
+                    connectorRef: account.harnessImage
+                    image: python:latest
+                    shell: Sh
+                    command: |-
+                      echo "Welcome to Harness CI"
+                      uname -a
+                      pip install poetry
+                      poetry install --no-root
+                      pytest -v
+                      echo "Done"
           platform:
             arch: Amd64
             os: Linux
