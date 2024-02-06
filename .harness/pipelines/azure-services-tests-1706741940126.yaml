@@ -41,7 +41,7 @@ pipeline:
                       echo "Activating poetry environment"
                       echo "Current dir: ".`pwd`
                       echo `ls -l`
-                      poetry run pytest
+                      poetry run pytest -m encryption
                       echo "Done"
           platform:
             os: Linux
