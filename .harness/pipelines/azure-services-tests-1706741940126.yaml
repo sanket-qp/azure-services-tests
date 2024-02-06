@@ -36,9 +36,10 @@ pipeline:
                       echo "Welcome to Harness CI"
                       uname -a
                       pip install poetry
+                      pip install pytest
                       poetry install --no-root
-                      echo "Current dir: "
-                      echo `pwd`
+                      echo "Current dir: ".`pwd`
+                      echo `ls -l`
                       pytest -v
                       echo "Done"
           platform:
