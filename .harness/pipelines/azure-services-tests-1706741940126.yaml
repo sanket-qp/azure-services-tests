@@ -38,11 +38,11 @@ pipeline:
                       pip install poetry
                       pip install pytest
                       poetry install --no-root
-                      echo "Activating poetry environment"
-                      echo "Current dir: ".`pwd`
-                      echo `ls -l`
-                      poetry run pytest -m encryption
-                      echo "Done"
+                      # echo "Activating poetry environment"
+                      # echo "Current dir: ".`pwd`
+                      # echo `ls -l`
+                      # poetry run pytest -m encryption
+                      # echo "Done"
           platform:
             os: Linux
             arch: Amd64
@@ -51,3 +51,32 @@ pipeline:
             spec: {}
         type: CI
         description: ""
+    - stage:
+        name: Test
+        identifier: Test
+        description: ""
+        type: CI
+        spec:
+          environment:
+            environmentRef: Postgres_Flex_Tests_Environment
+            deployToAll: false
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Run Tests
+                  identifier: Run_Tests
+                  spec:
+                    shell: Sh
+                    command: |-
+                      echo "Current dir: ".`pwd`
+                      echo `ls -l`
+                      echo "Done"
+                      poetry run pytest -v -k test_connect_as_dml_user
+        tags: {}
